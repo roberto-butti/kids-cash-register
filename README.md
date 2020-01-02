@@ -1,1 +1,1 @@
-# kids-cash-register
+# Kids Cash Register
