@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Barcode</title>
+    <!-- 001 - include a style.css -->
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+
+    
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <!-- 002 - include quagga.min.js -->
+    <script defer src="./node_modules/quagga/dist/quagga.min.js"></script>
+    <!-- 003 - include our script -->
+    <script defer src="./script.js"></script>
+</head>
+
+<body>
+    <!--div id="flow">
+        <span class="flow-1"></span>
+        <span class="flow-2"></span>
+        <span class="flow-3"></span>
+    </div-->
+    <div class="container">
+        <section class="hero is-primary is-bold">
+            <div class="hero-body">
+                <div class="container">
+                    <h1 class="title">
+                        LA CASSA
+                    </h1>
+                    <h2 class="subtitle">
+                        il tuo negozio
+                    </h2>
+                </div>
+            </div>
+        </section>
+        <div class="row columns is-multiline">
+            <div class="column is-one-third">
+                <div class="card">        
+                    <div class="card-image">
+                        <figure class="image">
+                            <video id="cam" width="1024" height="768" autoplay muted></video>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-one-third">
+                <p class="has-text-weight-bold is-uppercase is-size-1">PRODOTTO:</p>
+                <p id="product" class="has-text-info has-text-centered is-uppercase is-size-1">--</p>
+                <p class="has-text-weight-bold is-size-1">PREZZO (euro):</p>
+                <p id="price" class=" has-text-info has-text-centered is-size-1">--</p>
+                
+
+            </div>
+            <div class="column is-one-third">
+                <p id="icon" class="is-size-1"></p>
+            
+            </div>
+        </div>
+        <div class="columns">
+            <div class="column is-full">
+                <div class="field">
+                    <div class="control  is-large is-loading">
+                        <textarea class="textarea is-danger  is-large  is-focused" placeholder="Danger textarea"></textarea>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+    </div>
+    <footer class="footer">
+        <div class="content has-text-centered"></div>
+            <p>
+                Il Negozio delle meraviglie
+            </p>
+        </div>
+    </footer>
+    
+    
+</body>
+
+</html>
