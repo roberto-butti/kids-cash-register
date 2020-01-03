@@ -7,6 +7,7 @@
   let icon = "";
   let lastfind = "";
   let video = document.querySelector("#cam");
+  let detectedCode = "NO CODE DETECTED";
 
   let products = [
     {
@@ -53,6 +54,8 @@
     }
   ];
 
+  let productBuyed = [];
+
   async function startvideo() {
     console.info("I will access to webcam");
     // 003 - Access to Cam and display it on video DIV
@@ -65,25 +68,43 @@
   onMount(() => {
     video = document.querySelector("#cam");
     startvideo();
-
     Quagga.init(
       {
         inputStream: {
           name: "Live",
           type: "LiveStream",
-          target: document.querySelector("#cam") // Or '#yourElement' (optional)
+          target: document.querySelector("#cam"),
+          
+          constraints: {
+            width: 480,
+            height: 320,
+            facingMode: "environment"
+          }
+          
         },
         //locate: true,
         decoder: {
-          readers: ["ean_reader"]
+          readers: [
+            
+            "ean_reader",
+            
+          ],
           /*
-        debug: {
-            drawBoundingBox: true,
-            showFrequency: true,
-            drawScanline: true,
-            showPattern: true
-        }
-        */
+          debug: {
+            showCanvas: true,
+            showPatches: true,
+            showFoundPatches: true,
+            showSkeleton: true,
+            showLabels: true,
+            showPatchLabels: true,
+            showRemainingPatchLabels: true,
+            boxFromPatches: {
+              showTransformed: true,
+              showTransformedBox: true,
+              showBB: true
+            }
+          }
+          */
         }
       },
       function(err) {
@@ -98,10 +119,55 @@
     );
   });
 
+  Quagga.onProcessed(function(result) {
+    //console.log("processing" , result)
+    var drawingCtx = Quagga.canvas.ctx.overlay,
+      drawingCanvas = Quagga.canvas.dom.overlay;
+
+    if (result) {
+      if (result.boxes) {
+        drawingCtx.clearRect(
+          0,
+          0,
+          parseInt(drawingCanvas.getAttribute("width")),
+          parseInt(drawingCanvas.getAttribute("height"))
+        );
+        result.boxes
+          .filter(function(box) {
+            return box !== result.box;
+          })
+          .forEach(function(box) {
+            Quagga.ImageDebug.drawPath(box, { x: 0, y: 1 }, drawingCtx, {
+              color: "green",
+              lineWidth: 2
+            });
+          });
+      }
+
+      if (result.box) {
+        Quagga.ImageDebug.drawPath(result.box, { x: 0, y: 1 }, drawingCtx, {
+          color: "#00F",
+          lineWidth: 2
+        });
+      }
+
+      if (result.codeResult && result.codeResult.code) {
+        Quagga.ImageDebug.drawPath(
+          result.line,
+          { x: "x", y: "y" },
+          drawingCtx,
+          { color: "red", lineWidth: 3 }
+        );
+      }
+    }
+  });
   async function detectBarcode(data) {
+
     console.log(data);
     if (data && data.codeResult && data.codeResult.code) {
+
       let code = data.codeResult.code;
+      detectedCode = code;
       if (code == lastfind) {
         return;
       }
@@ -132,43 +198,46 @@
   }
 </script>
 
-<div class="row columns is-multiline">
-  <div class="column is-one-third">
-    <div class="card">
-      <div class="card-image">
-        <figure class="image">
-          <video id="cam" width="1024" height="768" autoplay muted />
-        </figure>
+<div class="tile is-ancestor">
+  <div class="tile is-vertical is-8">
+    <div class="tile">
+      <div class="tile is-parent is-vertical">
+        <article class="tile is-child box">
+          <!-- Put any content you want -->
+          {#if icon != ''}
+            <img src={icon} alt={product} />
+          {/if}
+        </article>
+        <article class="tile is-child box is-large">
+          <!-- Put any content you want -->
+          PREZZO (euro): {price}
+        </article>
+      </div>
+      <div class="tile is-parent">
+        <article class="tile is-child box">
+          <!-- Put any content you want -->
+          <video id="cam" width="480" height="320" autoplay muted />
+        </article>
       </div>
     </div>
-  </div>
-  <div class="column is-one-third">
-    <p class="has-text-weight-bold is-uppercase is-size-1">PRODOTTO:</p>
-    <p class="has-text-info has-text-centered is-uppercase is-size-1">
-      {product}
-    </p>
-    <p class="has-text-weight-bold is-size-1">PREZZO (euro):</p>
-    <p class=" has-text-info has-text-centered is-size-1">{price}</p>
-
-  </div>
-  <div class="column is-one-third">
-    <p class="is-size-1">
-      {#if icon != ''}
-        <img src={icon} alt={product} />
-      {/if}
-    </p>
-
-  </div>
-</div>
-<div class="columns">
-  <div class="column is-full">
-    <div class="field">
+    <div class="tile is-parent">
+      <article class="tile is-child box">
+        <!-- Put any content you want -->
+        PRODOTTO: {product}
+        <div class="field">
       <div class="control is-large is-loading">
         <textarea
           class="textarea is-danger is-large is-focused"
           placeholder="Danger textarea" />
       </div>
     </div>
+      </article>
+    </div>
   </div>
-
+  <div class="tile is-parent">
+    <article class="tile is-child box">
+      <!-- Put any content you want -->
+      { detectedCode }
+    </article>
+  </div>
 </div>
