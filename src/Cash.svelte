@@ -4,10 +4,11 @@
   let name = "world";
   let product = "";
   let price = 0.0;
-  let icon = "";
+  let icon = "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/apple/237/banknote-with-dollar-sign_1f4b5.png";
   let lastfind = "";
   let video = document.querySelector("#cam");
   let detectedCode = "NO CODE DETECTED";
+  let howmanyDetected = 0;
 
   let products = [
     {
@@ -68,28 +69,20 @@
   onMount(() => {
     video = document.querySelector("#cam");
     startvideo();
+
     Quagga.init(
       {
         inputStream: {
           name: "Live",
           type: "LiveStream",
           target: document.querySelector("#cam"),
-          
-          constraints: {
-            width: 480,
-            height: 320,
-            facingMode: "environment"
-          }
-          
         },
         //locate: true,
         decoder: {
           readers: [
-            
-            "ean_reader",
-            
+            "ean_reader"
           ],
-          /*
+          
           debug: {
             showCanvas: true,
             showPatches: true,
@@ -104,7 +97,7 @@
               showBB: true
             }
           }
-          */
+          
         }
       },
       function(err) {
@@ -114,12 +107,12 @@
         }
         console.log("Initialization finished. Ready to start");
         Quagga.start();
-        Quagga.onDetected(detectBarcode);
+        
       }
+    
     );
-  });
-
-  Quagga.onProcessed(function(result) {
+    Quagga.onDetected(detectBarcode);  
+      Quagga.onProcessed(function(result) {
     //console.log("processing" , result)
     var drawingCtx = Quagga.canvas.ctx.overlay,
       drawingCanvas = Quagga.canvas.dom.overlay;
@@ -161,12 +154,16 @@
       }
     }
   });
+  });
+
+
   async function detectBarcode(data) {
 
     console.log(data);
     if (data && data.codeResult && data.codeResult.code) {
 
       let code = data.codeResult.code;
+      howmanyDetected = howmanyDetected +1;
       detectedCode = code;
       if (code == lastfind) {
         return;
@@ -201,29 +198,29 @@
 <div class="tile is-ancestor">
   <div class="tile is-vertical is-8">
     <div class="tile">
-      <div class="tile is-parent is-vertical">
+    <div class="tile is-parent">
         <article class="tile is-child box">
           <!-- Put any content you want -->
-          {#if icon != ''}
-            <img src={icon} alt={product} />
-          {/if}
+          <video id="cam" width="1024" height="768" autoplay muted />
         </article>
-        <article class="tile is-child box is-large">
+      </div>
+      <div class="tile is-parent is-vertical">
+        <!--article class="tile is-child box">
+          
+        </article-->
+        <article class="tile is-child box has-text-info is-uppercase has-text-weight-bold is-size-1">
           <!-- Put any content you want -->
+          PRODOTTO: {product}
+          <br />
           PREZZO (euro): {price}
         </article>
       </div>
-      <div class="tile is-parent">
-        <article class="tile is-child box">
-          <!-- Put any content you want -->
-          <video id="cam" width="480" height="320" autoplay muted />
-        </article>
-      </div>
+      
     </div>
     <div class="tile is-parent">
       <article class="tile is-child box">
         <!-- Put any content you want -->
-        PRODOTTO: {product}
+        
         <div class="field">
       <div class="control is-large is-loading">
         <textarea
@@ -237,6 +234,10 @@
   <div class="tile is-parent">
     <article class="tile is-child box">
       <!-- Put any content you want -->
+                {#if icon != ''}
+            <img src={icon} alt={product} />
+          {/if}
+      ( { howmanyDetected } )
       { detectedCode }
     </article>
   </div>
